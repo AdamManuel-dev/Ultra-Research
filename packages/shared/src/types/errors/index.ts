@@ -8,13 +8,10 @@
  * Patterns: Include statusCode, context, and isOperational flag for proper error handling
  */
 
-export {
-  AppError,
-  AuthError,
-  ConfigError,
-  ErrorContext,
-  FetchError,
-  GraphError,
-  ServiceError,
-  ValidationError,
-} from './errors/index';
+export { AppError, ErrorContext } from './base';
+export { AuthError } from './auth';
+export { ConfigError } from './config';
+export { FetchError } from './fetch';
+export { GraphError } from './graph';
+export { ServiceError } from './service';
+export { ValidationError } from './validation';

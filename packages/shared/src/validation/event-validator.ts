@@ -10,8 +10,10 @@
 
 import Ajv, { ErrorObject } from 'ajv';
 import addFormats from 'ajv-formats';
-import { ResearchEvent } from '../types/events';
+
 import { ValidationError } from '../types/errors';
+import { ResearchEvent } from '../types/events';
+
 import { eventSchema } from './event-schema';
 
 /**
@@ -19,6 +21,7 @@ import { eventSchema } from './event-schema';
  */
 export class EventValidator {
   private ajv: Ajv;
+
   private validateFn: ReturnType<Ajv['compile']>;
 
   constructor() {
@@ -36,11 +39,11 @@ export class EventValidator {
 
     if (!valid) {
       const errors = this.validateFn.errors || [];
-      const errorMessages = this.formatErrors(errors);
+      const errorMessages = EventValidator.formatErrors(errors);
 
       throw new ValidationError(
         `Event validation failed: ${errorMessages.join('; ')}`,
-        this.getErrorFields(errors),
+        EventValidator.getErrorFields(errors),
         {
           errors: errors.map((e) => ({
             field: e.instancePath,
@@ -55,7 +58,7 @@ export class EventValidator {
   /**
    * Format validation errors into readable messages
    */
-  private formatErrors(errors: ErrorObject[]): string[] {
+  private static formatErrors(errors: ErrorObject[]): string[] {
     return errors.map((error) => {
       const field = error.instancePath || 'root';
       const message = error.message || 'validation failed';
@@ -66,7 +69,7 @@ export class EventValidator {
   /**
    * Extract field names from errors
    */
-  private getErrorFields(errors: ErrorObject[]): string[] {
+  private static getErrorFields(errors: ErrorObject[]): string[] {
     return errors
       .map((e) => {
         const path = e.instancePath.replace(/^\//, '').replace(/\//g, '.');
