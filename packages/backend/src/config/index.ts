@@ -8,8 +8,8 @@
  * Patterns: Use config.get() to access values, supports .env files via dotenv
  */
 
-import dotenv from 'dotenv';
 import { ConfigError } from '@deep-research/shared';
+import dotenv from 'dotenv';
 
 // Load .env file
 dotenv.config();

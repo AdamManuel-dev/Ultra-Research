@@ -8,14 +8,16 @@
  * Patterns: Middleware order matters - error handler must be last
  */
 
-import express, { Application } from 'express';
 import cors from 'cors';
+import express, { Application } from 'express';
 import helmet from 'helmet';
+
 import { config } from './config';
-import { logger } from './utils/logger';
 import { errorHandler, notFound } from './middleware/errorHandler';
-import { healthRouter } from './routes/health';
 import { eventsRouter } from './routes/events';
+import { eventsAdvancedRouter } from './routes/events-advanced';
+import { healthRouter } from './routes/health';
+import { logger } from './utils/logger';
 
 /**
  * Create and configure Express application
@@ -52,6 +54,7 @@ export function createApp(): Application {
   // Routes
   app.use('/health', healthRouter);
   app.use('/events', eventsRouter);
+  app.use('/events', eventsAdvancedRouter);
 
   // 404 handler
   app.use(notFound);

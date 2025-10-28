@@ -8,8 +8,9 @@
  * Patterns: Distinguishes operational vs programming errors, logs all errors
  */
 
-import { Request, Response, NextFunction } from 'express';
 import { AppError } from '@deep-research/shared';
+import { Request, Response, NextFunction } from 'express';
+
 import { logger, logError } from '../utils/logger';
 
 /**
@@ -49,8 +50,7 @@ export function errorHandler(err: Error, req: Request, res: Response, _next: Nex
   });
 
   // Don't leak error details in production
-  const message =
-    process.env['NODE_ENV'] === 'production' ? 'Internal server error' : err.message;
+  const message = process.env['NODE_ENV'] === 'production' ? 'Internal server error' : err.message;
 
   return res.status(500).json({
     error: {
@@ -79,7 +79,9 @@ export function notFound(req: Request, res: Response) {
 /**
  * Async route wrapper to catch promise rejections
  */
-export function asyncHandler(fn: (req: Request, res: Response, next: NextFunction) => Promise<unknown>) {
+export function asyncHandler(
+  fn: (req: Request, res: Response, next: NextFunction) => Promise<unknown>
+) {
   return (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch(next);
   };

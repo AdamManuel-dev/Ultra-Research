@@ -8,8 +8,9 @@
  * Patterns: RESTful API, Server-Sent Events for real-time updates
  */
 
-import { Router, Request, Response } from 'express';
 import { ResearchEvent } from '@deep-research/shared';
+import { Router, Request, Response } from 'express';
+
 import { asyncHandler } from '../middleware/errorHandler';
 import { eventBus } from '../services/event-bus';
 import { logger } from '../utils/logger';

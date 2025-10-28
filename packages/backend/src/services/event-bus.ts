@@ -9,10 +9,13 @@
  */
 
 import { EventEmitter } from 'events';
+
+import { ResearchEvent, EventStreamMessage, eventValidator } from '@deep-research/shared';
 import { Request, Response } from 'express';
-import { ResearchEvent, EventStreamMessage } from '@deep-research/shared';
-import { eventValidator } from '@deep-research/shared';
+
 import { logger } from '../utils/logger';
+
+import { opensearchEventIndexer } from './opensearch-event-indexer';
 
 /**
  * Event subscriber interface
@@ -38,9 +41,13 @@ interface SSEClient {
  */
 export class EventBus {
   private emitter: EventEmitter;
+
   private subscribers: Map<string, EventSubscriber>;
+
   private sseClients: Map<string, SSEClient>;
+
   private eventHistory: ResearchEvent[];
+
   private readonly maxHistorySize: number = 1000;
 
   constructor() {
@@ -73,6 +80,16 @@ export class EventBus {
       // Send to SSE clients
       this.broadcastToSSE(event);
 
+      // Index in OpenSearch (async, don't wait)
+      opensearchEventIndexer.indexEvent(event).catch((error) => {
+        logger.error('Failed to index event in OpenSearch', {
+          metadata: {
+            error: error instanceof Error ? error.message : String(error),
+            event_id: `${event.run_id}-${event.step_id}`,
+          },
+        });
+      });
+
       const latency = Date.now() - startTime;
 
       logger.info('Event published', {
@@ -99,11 +116,7 @@ export class EventBus {
   /**
    * Subscribe to events with optional run_id filter
    */
-  subscribe(
-    id: string,
-    callback: (event: ResearchEvent) => void,
-    runId?: string
-  ): () => void {
+  subscribe(id: string, callback: (event: ResearchEvent) => void, runId?: string): () => void {
     const subscriber: EventSubscriber = {
       id,
       runId,

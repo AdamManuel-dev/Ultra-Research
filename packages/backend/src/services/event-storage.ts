@@ -9,6 +9,7 @@
  */
 
 import { ResearchEvent } from '@deep-research/shared';
+
 import { logger } from '../utils/logger';
 
 /**
@@ -26,7 +27,9 @@ interface StorageConfig {
  */
 export class EventStorage {
   private buffer: Map<string, ResearchEvent[]>;
+
   private readonly config: StorageConfig;
+
   private flushTimer?: NodeJS.Timeout;
 
   constructor(config?: Partial<StorageConfig>) {
