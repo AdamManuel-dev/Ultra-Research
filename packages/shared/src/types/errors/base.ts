@@ -8,12 +8,39 @@
  * Patterns: Include statusCode, context, and isOperational flag for proper error handling
  */
 
+/**
+ * Additional context information for errors
+ *
+ * @example
+ * const context: ErrorContext = {
+ *   userId: '12345',
+ *   operation: 'fetch',
+ *   url: 'https://example.com'
+ * };
+ */
 export interface ErrorContext {
   [key: string]: unknown;
 }
 
 /**
  * Base application error class with enhanced context and tracking
+ *
+ * All application-specific errors should extend this class to ensure
+ * consistent error handling, logging, and HTTP status code mapping.
+ *
+ * @example
+ * class CustomError extends AppError {
+ *   constructor(message: string, context?: ErrorContext) {
+ *     super(message, 500, context, true);
+ *   }
+ * }
+ *
+ * @example
+ * try {
+ *   // risky operation
+ * } catch (error) {
+ *   throw new AppError('Operation failed', 500, { originalError: error });
+ * }
  */
 export class AppError extends Error {
   public readonly statusCode: number;
@@ -22,8 +49,17 @@ export class AppError extends Error {
 
   public readonly isOperational: boolean;
 
+  /** ISO 8601 timestamp when error occurred */
   public readonly timestamp: string;
 
+  /**
+   * Create a new AppError
+   *
+   * @param message - Human-readable error message
+   * @param statusCode - HTTP status code (default: 500)
+   * @param context - Additional error context
+   * @param isOperational - Whether error is operational (expected) or programming error
+   */
   constructor(message: string, statusCode = 500, context?: ErrorContext, isOperational = true) {
     super(message);
     this.name = this.constructor.name;
@@ -36,6 +72,11 @@ export class AppError extends Error {
     Error.captureStackTrace(this, this.constructor);
   }
 
+  /**
+   * Convert error to JSON for logging and API responses
+   *
+   * @returns JSON representation of the error
+   */
   toJSON() {
     return {
       name: this.name,

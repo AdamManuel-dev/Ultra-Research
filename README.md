@@ -510,67 +510,111 @@ Authority-based metadata and enrichment:
 
 ### Prerequisites
 
-- Docker & Docker Compose
-- API keys for LLM providers (OpenAI, Anthropic, or similar)
-- Optional: Neo4j and OpenSearch (or use provided Docker services)
+**System Requirements**:
+- **Node.js** 18.0.0 or higher
+- **npm** 9.0.0 or higher
+- **Docker Desktop** (or Docker Engine + Docker Compose v2.0+)
+- **8GB RAM** minimum (16GB recommended)
+- **20GB disk space** for Docker volumes
+
+**Optional**:
+- API keys for LLM providers (OpenAI, Anthropic) - for future integrations
 
 ### Installation
 
-1. **Clone the repository**
+**5-Minute Setup**:
 
-   ```bash
-   git clone https://github.com/yourusername/deep-research-cockpit.git
-   cd deep-research-cockpit
-   ```
+```bash
+# 1. Clone the repository
+git clone https://github.com/yourusername/deep-research-cockpit.git
+cd deep-research-cockpit
 
-2. **Configure environment**
+# 2. Install dependencies
+npm install
 
-   ```bash
-   cp .env.example .env
-   # Edit .env with your API keys and configuration
-   ```
+# 3. Start infrastructure services (Neo4j, OpenSearch, Redis, MinIO)
+npm run docker:up
 
-3. **Start services**
+# 4. Wait for services to be healthy (~1-2 minutes)
+docker-compose ps  # All services should show "healthy"
 
-   ```bash
-   docker-compose up -d
-   ```
+# 5. Start development servers (backend + frontend)
+npm run dev
+```
 
-4. **Initialize the system**
+**Access the Application**:
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:3001
+- **Health Check**: http://localhost:3001/health
 
-   ```bash
-   docker-compose exec api python scripts/init_schema.py
-   docker-compose exec api python scripts/init_indices.py
-   ```
+### Verify Installation
 
-5. **Access the UI**
+```bash
+# Check backend health
+curl http://localhost:3001/health | jq
 
-   ```bash
-   http://localhost:3000
-   ```
+# Expected output:
+{
+  "status": "healthy",
+  "services": {
+    "neo4j": { "status": "connected", "latency_ms": 12 },
+    "opensearch": { "status": "connected", "latency_ms": 45 },
+    "redis": { "status": "connected", "latency_ms": 3 }
+  },
+  "uptime_seconds": 42,
+  "version": "0.1.0"
+}
+```
 
 ### First Research Session
 
-1. **Start a new research run** with a simple query (e.g., "How does RAG retrieval work?")
-2. **Experiment with controls**:
-   - Adjust the **Depth/Breadth** slider to see frontier change
-   - Toggle **Core-First** to emphasize L0/L1 sources
-   - Click on a ranked source to see its **Why-Ranked** breakdown
-3. **Monitor the live log** to see decisions and extracted claims
-4. **View the frontier map** to see concept relationships
-5. **Let it run** for 2-3 minutes, then:
-   - Switch to **Review Mode**
-   - Check the **Effectiveness Dashboard** for TTFC and Authority Mix
-   - Review the **Evidence Ledger** for discovered claims
-   - Try the **Timeline Replay** to step through discoveries
+> **Note**: In the current pre-alpha phase, many UI features are still in development. The backend event system and storage are functional.
+
+1. **Open the UI** at http://localhost:3000
+2. **Create a new research session** (when UI is ready)
+3. **Monitor events in real-time**:
+   ```bash
+   # Watch event stream
+   curl -N http://localhost:3001/events/stream
+   ```
+4. **Check stored events**:
+   - OpenSearch Dashboards: http://localhost:5601
+   - MinIO Console: http://localhost:9001
+
+### Troubleshooting
+
+**Services won't start?**
+```bash
+# Check Docker is running
+docker ps
+
+# Check port conflicts
+lsof -i :7474  # Neo4j
+lsof -i :9200  # OpenSearch
+
+# View logs
+npm run docker:logs
+```
+
+**Need more help?**
+- See detailed [Getting Started Guide](docs/guides/GETTING_STARTED.md)
+- Check [Troubleshooting section](docs/guides/GETTING_STARTED.md#troubleshooting)
+- Open an issue on GitHub
 
 ### Next Steps
 
-- Read the [Strategy Controls Guide](docs/guides/strategy-controls.md) for advanced steering
-- Explore [Reading Queue Management](docs/guides/reading-queue.md) for core-first workflows
-- Check [Contributing Guide](CONTRIBUTING.md) to help improve the system
+**For Users**:
+- Explore the system as features are implemented
+- Provide feedback on GitHub Discussions
 
-For comprehensive setup and troubleshooting, see [Installation Guide](docs/guides/installation.md).
+**For Developers**:
+- Read [Development Guide](docs/guides/DEVELOPMENT.md) - Workflow and standards
+- Read [Architecture Overview](ARCHITECTURE.md) - System design
+- Check [Contributing Guide](CONTRIBUTING.md) - How to contribute
+- Review [Testing Guide](docs/guides/TESTING.md) - Testing practices
+
+**Complete Documentation**:
+- [Documentation Index](docs/INDEX.md) - All documentation organized by role and topic
 
 ---
 
@@ -606,44 +650,74 @@ For comprehensive setup and troubleshooting, see [Installation Guide](docs/guide
 
 ## Documentation Map
 
-Navigate to deeper documentation based on your role:
+> **📚 Complete Documentation Index**: See [docs/INDEX.md](docs/INDEX.md) for all documentation organized by role and topic
 
-### For Research Engineers & Analysts
+### Quick Links by Role
 
-- **[Pilot View UI Guide](docs/guides/pilot-ui.md)** - Master the live research interface
-- **[Strategy Controls Guide](docs/guides/strategy-controls.md)** - Steer exploration effectively
-- **[Source Tiers & Core-First Prioritization](docs/guides/source-tiers.md)** - Understanding authority ranking
-- **[Reading Queue Management](docs/guides/reading-queue.md)** - Building optimal reading order
-- **[Review Mode Deep Dive](docs/guides/review-mode.md)** - Analyzing completed research sessions
+#### 👨‍💻 For Developers
 
-### For Developers & Contributors
+**Essential Guides**:
+- **[Getting Started Guide](docs/guides/GETTING_STARTED.md)** - Setup and installation (30-45 min)
+- **[Development Guide](docs/guides/DEVELOPMENT.md)** - Workflow and standards
+- **[Testing Guide](docs/guides/TESTING.md)** - Testing strategy and practices
+- **[Architecture Overview](ARCHITECTURE.md)** - System design and components
+- **[Contributing Guide](CONTRIBUTING.md)** - How to contribute code
 
-- **[Architecture Deep Dive](docs/architecture/overview.md)** - System design and components
-- **[API Reference](docs/api/README.md)** - Endpoints and data contracts
-- **[Event Schema & Replay](docs/architecture/events.md)** - JSONL structure and formats
-- **[Graph Schema & Queries](docs/architecture/graph.md)** - Knowledge graph design
-- **[Contributing Guide](CONTRIBUTING.md)** - Development setup, style, and process
+**Architecture Deep Dives**:
+- [System Components](ARCHITECTURE.md#system-components) - Backend, frontend, services
+- [Data Flow Architecture](ARCHITECTURE.md#data-flow-architecture) - Request/event flow
+- [Event-Driven Architecture](ARCHITECTURE.md#event-driven-architecture) - Event sourcing
+- [Database Schemas](ARCHITECTURE.md#database-schemas) - Neo4j, OpenSearch, Redis
 
-### For Technical Leaders & Product Managers
+#### 🔬 For Research Engineers & Analysts
 
-- **[Complete PRD Suite](docs/PRD/PRD.md)** - Full product requirements and vision
-- **[Evaluation Framework](docs/evaluation/README.md)** - Quality metrics and measurement
-- **[Cost & Performance Management](docs/guides/cost-management.md)** - Budget controls and optimization
-- **[Security & Compliance](docs/guides/security.md)** - Privacy, compliance, and safety
-- **[Roadmap & Timeline](docs/ROADMAP.md)** - Development phases and milestones
+**User Guides** (Coming Soon):
+- Pilot View UI Guide - Master the live research interface
+- Strategy Controls Guide - Steer exploration effectively
+- Source Tiers & Core-First - Understanding authority ranking
+- Reading Queue Management - Building optimal reading order
+- Review Mode Deep Dive - Analyzing completed sessions
 
-### For Data Scientists & Researchers
+#### 🏢 For Technical Leaders & Product Managers
 
-- **[GraphRAG Implementation](docs/architecture/graphrag.md)** - Graph-guided retrieval details
-- **[Ranking Algorithms](docs/guides/ranking-algorithms.md)** - Scoring function design
-- **[Evaluation & Metrics](docs/evaluation/metrics.md)** - Measurement methodology
-- **[Source Classification](docs/architecture/source-classification.md)** - L0-L4 detection
+**Strategic Documentation**:
+- **[Project Overview](README.md)** - Vision, features, and roadmap
+- **[Architecture Overview](ARCHITECTURE.md)** - System design and scalability
+- **[Complete PRD Suite](docs/PRD/PRD.md)** - Product requirements and specifications
+- **[Deployment Guide](docs/guides/DEPLOYMENT.md)** - Deployment strategies and operations
 
-### All Roles
+**Future Documentation**:
+- Evaluation Framework - Quality metrics and measurement
+- Cost & Performance Management - Budget controls and optimization
+- Security & Compliance - Privacy, compliance, and safety
 
-- **[Glossary](docs/GLOSSARY.md)** - Key terminology and concepts
-- **[FAQ](docs/FAQ.md)** - Common questions and answers
-- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common issues and solutions
+#### 📊 For Data Scientists
+
+**Technical Implementation** (Planned):
+- GraphRAG Implementation - Graph-guided retrieval details
+- Ranking Algorithms - Scoring function design
+- Evaluation & Metrics - Measurement methodology
+- Source Classification - L0-L4 detection algorithms
+
+### Core Documentation
+
+| Document | Description | Status |
+|----------|-------------|--------|
+| [README.md](README.md) | Project overview and quick start | ✅ Current |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Complete system architecture | ✅ Current |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines | ✅ Current |
+| [Getting Started](docs/guides/GETTING_STARTED.md) | Setup and installation | ✅ Current |
+| [Development Guide](docs/guides/DEVELOPMENT.md) | Development workflow | ✅ Current |
+| [Testing Guide](docs/guides/TESTING.md) | Testing practices | ✅ Current |
+| [Deployment Guide](docs/guides/DEPLOYMENT.md) | Deployment strategies | ✅ Current |
+| [Documentation Index](docs/INDEX.md) | Complete documentation map | ✅ Current |
+
+### Additional Resources
+
+- **[Glossary](#glossary)** - Key terminology and concepts
+- **[PRD Documents](docs/PRD/)** - Product requirements and specifications
+- **[GitHub Issues](https://github.com/yourusername/deep-research-cockpit/issues)** - Bug reports and feature requests
+- **[GitHub Discussions](https://github.com/yourusername/deep-research-cockpit/discussions)** - Questions and community
 
 ---
 
@@ -808,12 +882,14 @@ Built with gratitude for these excellent projects:
 
 ## Quick Links
 
-- 📚 [Documentation](docs/)
-- 🚀 [Getting Started](docs/guides/installation.md)
-- 🏗️ [Architecture](docs/architecture/overview.md)
-- 🔬 [API Reference](docs/api/README.md)
-- 📋 [Roadmap](docs/ROADMAP.md)
-- 💬 [Discussions](https://github.com/yourusername/deep-research-cockpit/discussions)
+- 📚 [Documentation Index](docs/INDEX.md) - All docs organized by role
+- 🚀 [Getting Started](docs/guides/GETTING_STARTED.md) - 30-minute setup guide
+- 🏗️ [Architecture](ARCHITECTURE.md) - Complete system design
+- 👨‍💻 [Development Guide](docs/guides/DEVELOPMENT.md) - Workflow and standards
+- 🧪 [Testing Guide](docs/guides/TESTING.md) - Testing practices
+- 🤝 [Contributing](CONTRIBUTING.md) - How to contribute
+- 📋 [Roadmap](#roadmap--status) - Development phases
+- 💬 [Discussions](https://github.com/yourusername/deep-research-cockpit/discussions) - Community Q&A
 
 ---
 

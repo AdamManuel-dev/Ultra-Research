@@ -1,6 +1,11 @@
 /**
- * @fileoverview Vite configuration for frontend development
- * @lastmodified 2025-10-28
+ * @fileoverview Vite configuration for Deep Research Cockpit frontend
+ * @lastmodified 2025-10-28T13:21:12Z
+ *
+ * Features: React dev server, API proxy, path aliases, vitest config
+ * Main APIs: defineConfig with React plugin, dev server on port 5173
+ * Constraints: Requires backend API at localhost:3000 for proxy
+ * Patterns: WebSocket proxy for /events, sourcemaps enabled, jsdom test env
  */
 
 import { defineConfig } from 'vite';
