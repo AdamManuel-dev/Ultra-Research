@@ -4,7 +4,7 @@
 
 An AI-powered research cockpit that explores web knowledge with real-time controls, prioritizes primary sources, and builds a verifiable graph of insights. Built for technical professionals who demand transparency and control: research engineers, PMs, data analysts, and tech leads.
 
-> 🚧 **Project Status**: This is the foundational README for Deep Research Cockpit. The system is under active development (Pre-Alpha / Foundation phase). Core architecture is designed; implementing Phase 1 components. Documentation links reference the planned structure and will be populated as components are built.
+> 🚧 **Project Status**: Deep Research Cockpit is under active development (Alpha - Phase 3: Advanced Features). Core research pipeline is functional, with Phase 1 (Foundations) and Phase 2 (Ranking & Core-First) complete. Currently implementing advanced features including graph memory and JS rendering.
 
 ---
 
@@ -508,6 +508,8 @@ Authority-based metadata and enrichment:
 
 ## Quick Start
 
+> **📚 Complete Setup Guide**: For detailed installation instructions, troubleshooting, and verification steps, see the [Getting Started Guide](docs/guides/GETTING_STARTED.md) (30-45 minutes).
+
 ### Prerequisites
 
 **System Requirements**:
@@ -597,8 +599,9 @@ npm run docker:logs
 ```
 
 **Need more help?**
-- See detailed [Getting Started Guide](docs/guides/GETTING_STARTED.md)
-- Check [Troubleshooting section](docs/guides/GETTING_STARTED.md#troubleshooting)
+- See comprehensive [Getting Started Guide](docs/guides/GETTING_STARTED.md) with detailed troubleshooting
+- Check [Getting Started - Troubleshooting](docs/guides/GETTING_STARTED.md#troubleshooting) for common issues
+- Review [Development Guide](docs/guides/DEVELOPMENT.md) for development workflow
 - Open an issue on GitHub
 
 ### Next Steps
@@ -652,11 +655,18 @@ npm run docker:logs
 
 > **📚 Complete Documentation Index**: See [docs/INDEX.md](docs/INDEX.md) for all documentation organized by role and topic
 
+This README provides a high-level overview. For detailed information:
+
+- **System-level docs**: See [docs/](docs/) directory for guides, architecture, and PRDs
+- **Package-level docs**: Each package (`backend/`, `frontend/`, `shared/`) has its own detailed documentation in `packages/{name}/docs/`
+- **API references**: Available in both root ARCHITECTURE.md and package-specific API.md files
+
 ### Quick Links by Role
 
 #### 👨‍💻 For Developers
 
 **Essential Guides**:
+
 - **[Getting Started Guide](docs/guides/GETTING_STARTED.md)** - Setup and installation (30-45 min)
 - **[Development Guide](docs/guides/DEVELOPMENT.md)** - Workflow and standards
 - **[Testing Guide](docs/guides/TESTING.md)** - Testing strategy and practices
@@ -664,6 +674,7 @@ npm run docker:logs
 - **[Contributing Guide](CONTRIBUTING.md)** - How to contribute code
 
 **Architecture Deep Dives**:
+
 - [System Components](ARCHITECTURE.md#system-components) - Backend, frontend, services
 - [Data Flow Architecture](ARCHITECTURE.md#data-flow-architecture) - Request/event flow
 - [Event-Driven Architecture](ARCHITECTURE.md#event-driven-architecture) - Event sourcing
@@ -672,6 +683,7 @@ npm run docker:logs
 #### 🔬 For Research Engineers & Analysts
 
 **User Guides** (Coming Soon):
+
 - Pilot View UI Guide - Master the live research interface
 - Strategy Controls Guide - Steer exploration effectively
 - Source Tiers & Core-First - Understanding authority ranking
@@ -681,12 +693,14 @@ npm run docker:logs
 #### 🏢 For Technical Leaders & Product Managers
 
 **Strategic Documentation**:
+
 - **[Project Overview](README.md)** - Vision, features, and roadmap
 - **[Architecture Overview](ARCHITECTURE.md)** - System design and scalability
 - **[Complete PRD Suite](docs/PRD/PRD.md)** - Product requirements and specifications
 - **[Deployment Guide](docs/guides/DEPLOYMENT.md)** - Deployment strategies and operations
 
 **Future Documentation**:
+
 - Evaluation Framework - Quality metrics and measurement
 - Cost & Performance Management - Budget controls and optimization
 - Security & Compliance - Privacy, compliance, and safety
@@ -694,6 +708,7 @@ npm run docker:logs
 #### 📊 For Data Scientists
 
 **Technical Implementation** (Planned):
+
 - GraphRAG Implementation - Graph-guided retrieval details
 - Ranking Algorithms - Scoring function design
 - Evaluation & Metrics - Measurement methodology
@@ -712,6 +727,32 @@ npm run docker:logs
 | [Deployment Guide](docs/guides/DEPLOYMENT.md) | Deployment strategies | ✅ Current |
 | [Documentation Index](docs/INDEX.md) | Complete documentation map | ✅ Current |
 
+### Package Documentation
+
+Each package has its own detailed documentation:
+
+**Backend** (`packages/backend/docs/`):
+
+- [Backend README](packages/backend/docs/README.md) - Backend overview and setup
+- [Backend API](packages/backend/docs/API.md) - API endpoint reference
+- [Services](packages/backend/docs/modules/services.md) - Service layer documentation
+- [Middleware](packages/backend/docs/modules/middleware.md) - Express middleware
+- [Utils](packages/backend/docs/modules/utils.md) - Utility functions
+
+**Frontend** (`packages/frontend/docs/`):
+
+- [Frontend Architecture](packages/frontend/docs/ARCHITECTURE.md) - Frontend design patterns
+- [Frontend Development](packages/frontend/docs/DEVELOPMENT.md) - Development workflow
+- [Components](packages/frontend/docs/COMPONENTS.md) - React component library
+- [Hooks](packages/frontend/docs/modules/hooks.md) - Custom React hooks
+- [State Management](packages/frontend/docs/modules/state.md) - Redux state structure
+
+**Shared** (`packages/shared/docs/`):
+
+- [Shared API](packages/shared/docs/API.md) - Shared utilities and types
+- [Types](packages/shared/docs/types.md) - TypeScript type definitions
+- [Validation](packages/shared/docs/validation.md) - Validation schemas
+
 ### Additional Resources
 
 - **[Glossary](#glossary)** - Key terminology and concepts
@@ -725,7 +766,7 @@ npm run docker:logs
 
 ### Current Status
 
-**Alpha** — Core research pipeline functional; evaluating user workflows and performance characteristics
+**Alpha - Phase 3** — Core research pipeline functional (Phases 1-2 complete); currently implementing advanced features (graph memory, JS rendering, video pipeline); evaluating user workflows and performance characteristics
 
 ### Rollout Phases
 
@@ -859,7 +900,8 @@ This project is licensed under the **MIT License** — see [LICENSE](LICENSE) fi
 
 ### Support
 
-- **Questions?** Check our [FAQ](docs/FAQ.md) and [Troubleshooting Guide](docs/TROUBLESHOOTING.md)
+- **Questions?** Check the [Getting Started Guide](docs/guides/GETTING_STARTED.md) and [Documentation Index](docs/INDEX.md)
+- **Troubleshooting?** See [Getting Started - Troubleshooting](docs/guides/GETTING_STARTED.md#troubleshooting) section
 - **Found a bug?** [Report it on GitHub](https://github.com/yourusername/deep-research-cockpit/issues)
 - **Security issue?** Email [security@example.com](mailto:security@example.com) (do not open a public issue)
 - **General discussion?** Join our community:
