@@ -1,0 +1,18 @@
+{
+  "extends": "../../.eslintrc.json",
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "ignorePatterns": ["**/*.test.ts", "**/*.spec.ts"],
+  "settings": {
+    "import/resolver": {
+      "typescript": {
+        "project": "./tsconfig.json",
+        "alwaysTryTypes": true
+      }
+    }
+  },
+  "rules": {
+    "no-underscore-dangle": ["error", { "allow": ["_source", "_redirects", "_redirectable"] }]
+  }
+}

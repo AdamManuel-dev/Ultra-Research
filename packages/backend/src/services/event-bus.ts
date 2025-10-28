@@ -61,7 +61,7 @@ export class EventBus {
   /**
    * Publish an event to all subscribers
    */
-  async publish(event: ResearchEvent): Promise<void> {
+  publish(event: ResearchEvent): void {
     const startTime = Date.now();
 
     try {
@@ -180,7 +180,7 @@ export class EventBus {
     });
 
     // Send initial heartbeat
-    this.sendSSE(res, { event: 'heartbeat', data: { message: 'connected' } });
+    EventBus.sendSSE(res, { event: 'heartbeat', data: { message: 'connected' } });
 
     // Handle client disconnect
     req.on('close', () => {
@@ -196,7 +196,7 @@ export class EventBus {
         clearInterval(heartbeatInterval);
         return;
       }
-      this.sendSSE(res, { event: 'heartbeat', data: { message: 'alive' } });
+      EventBus.sendSSE(res, { event: 'heartbeat', data: { message: 'alive' } });
     }, 30000); // 30 seconds
 
     req.on('close', () => clearInterval(heartbeatInterval));
@@ -206,7 +206,7 @@ export class EventBus {
    * Broadcast event to all SSE clients
    */
   private broadcastToSSE(event: ResearchEvent) {
-    for (const [clientId, client] of this.sseClients.entries()) {
+    this.sseClients.forEach((client, clientId) => {
       // Filter by run_id if client specified one
       if (!client.runId || event.run_id === client.runId) {
         try {
@@ -216,7 +216,7 @@ export class EventBus {
             id: `${event.run_id}-${event.step_id}`,
           };
 
-          this.sendSSE(client.response, message);
+          EventBus.sendSSE(client.response, message);
         } catch (error) {
           logger.error('Failed to send SSE to client', {
             metadata: {
@@ -228,13 +228,13 @@ export class EventBus {
           this.sseClients.delete(clientId);
         }
       }
-    }
+    });
   }
 
   /**
    * Send SSE message to client
    */
-  private sendSSE(res: Response, message: EventStreamMessage) {
+  private static sendSSE(res: Response, message: EventStreamMessage) {
     if (res.writableEnded) return;
 
     try {

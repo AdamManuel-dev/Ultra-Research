@@ -15,7 +15,7 @@ import { logger } from './utils/logger';
 /**
  * Start the server
  */
-async function start() {
+function start() {
   try {
     logger.info('Starting Deep Research Cockpit backend', {
       metadata: {
@@ -37,7 +37,7 @@ async function start() {
     });
 
     // Graceful shutdown
-    const shutdown = async () => {
+    const shutdown = () => {
       logger.info('Received shutdown signal, closing server gracefully');
 
       server.close(() => {
@@ -52,8 +52,12 @@ async function start() {
       }, 10000);
     };
 
-    process.on('SIGTERM', shutdown);
-    process.on('SIGINT', shutdown);
+    process.on('SIGTERM', () => {
+      shutdown();
+    });
+    process.on('SIGINT', () => {
+      shutdown();
+    });
 
     // Handle uncaught errors
     process.on('uncaughtException', (error: Error) => {

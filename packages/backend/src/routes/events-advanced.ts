@@ -81,10 +81,11 @@ eventsAdvancedRouter.get(
         result = await opensearchEventIndexer.getAgentActivity(runId);
         break;
 
-      case 'custom':
-        const customAggs = req.body.aggregations || {};
+      case 'custom': {
+        const customAggs = (req.body.aggregations as Record<string, unknown>) || {};
         result = await opensearchEventIndexer.aggregateEvents({ run_id: runId }, customAggs);
         break;
+      }
 
       default:
         res.status(400).json({

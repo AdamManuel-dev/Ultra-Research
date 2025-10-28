@@ -35,7 +35,7 @@ interface HealthResponse {
 /**
  * Check dependency health
  */
-async function checkDependencies() {
+function checkDependencies() {
   const dependencies: HealthResponse['dependencies'] = {};
 
   // TODO: Implement actual health checks for each service
@@ -54,9 +54,9 @@ async function checkDependencies() {
  */
 healthRouter.get(
   '/',
-  asyncHandler(async (_req: Request, res: Response) => {
+  asyncHandler((_req: Request, res: Response) => {
     const startTime = Date.now();
-    const dependencies = await checkDependencies();
+    const dependencies = checkDependencies();
 
     // Determine overall status
     const hasDownDependency = Object.values(dependencies).some((dep) => dep.status === 'down');

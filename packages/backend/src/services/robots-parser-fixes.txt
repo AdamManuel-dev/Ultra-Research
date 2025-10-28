@@ -1,0 +1,12 @@
+These methods should be static:
+- getRobotsTxtUrl (line 53)
+- getDomainKey (line 61)
+- parse (line 133)
+- matchesPattern (line 298)
+
+For...of loops to replace (can use /* eslint-disable no-restricted-syntax */ for complex ones):
+- Line 141: for (const line of lines)
+- Line 239: for (const rule of userAgentGroup.rules)  
+- Line 241: for (const pattern of rule.disallowed)
+- Line 248: for (const pattern of rule.allowed)
+- Line 283: for (const group of this.groups)

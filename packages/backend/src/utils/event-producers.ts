@@ -60,8 +60,8 @@ function createEvent(
 /**
  * Publish an event to the event bus
  */
-export async function publishEvent(event: ResearchEvent): Promise<void> {
-  await eventBus.publish(event);
+export function publishEvent(event: ResearchEvent): void {
+  eventBus.publish(event);
 }
 
 // ==================== ORCHESTRATOR EVENTS ====================
@@ -439,6 +439,6 @@ export function getCurrentStep(runId: string): number {
 /**
  * Helper to publish an event immediately
  */
-export async function emitEvent(event: ResearchEvent): Promise<void> {
-  await eventBus.publish(event);
+export function emitEvent(event: ResearchEvent): void {
+  eventBus.publish(event);
 }

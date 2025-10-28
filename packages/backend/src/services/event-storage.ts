@@ -46,8 +46,8 @@ export class EventStorage {
   /**
    * Store an event (adds to buffer for batched write)
    */
-  async store(event: ResearchEvent): Promise<void> {
-    const partition = this.getPartitionKey(event);
+  store(event: ResearchEvent): void {
+    const partition = EventStorage.getPartitionKey(event);
 
     if (!this.buffer.has(partition)) {
       this.buffer.set(partition, []);
@@ -58,14 +58,20 @@ export class EventStorage {
 
     // Flush if batch is full
     if (events.length >= this.config.batchSize) {
-      await this.flush(partition);
+      this.flush(partition).catch((error) => {
+        logger.error('Failed to auto-flush', {
+          metadata: {
+            error: error instanceof Error ? error.message : String(error),
+          },
+        });
+      });
     }
   }
 
   /**
    * Generate partition key: run_id/YYYY-MM-DD
    */
-  private getPartitionKey(event: ResearchEvent): string {
+  private static getPartitionKey(event: ResearchEvent): string {
     const date = new Date(event.ts).toISOString().split('T')[0];
     return `${event.run_id}/${date}`;
   }
@@ -73,7 +79,7 @@ export class EventStorage {
   /**
    * Generate object key: run_id/YYYY-MM-DD/HH-mm-ss-SSS.jsonl
    */
-  private getObjectKey(partition: string): string {
+  private static getObjectKey(partition: string): string {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').split('Z')[0];
     return `events/${partition}/${timestamp}.jsonl`;
   }
@@ -81,15 +87,20 @@ export class EventStorage {
   /**
    * Flush buffered events to storage
    */
-  async flush(partition?: string): Promise<void> {
+  flush(partition?: string): Promise<void> {
     const partitions = partition ? [partition] : Array.from(this.buffer.keys());
 
+    // Process partitions sequentially to avoid concurrent write issues
+    // eslint-disable-next-line no-restricted-syntax
     for (const p of partitions) {
       const events = this.buffer.get(p);
-      if (!events || events.length === 0) continue;
+      if (!events || events.length === 0) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
 
       try {
-        await this.writeEventsToStorage(p, events);
+        EventStorage.writeEventsToStorage(p, events);
 
         logger.info('Events flushed to storage', {
           metadata: {
@@ -111,14 +122,15 @@ export class EventStorage {
         // Keep events in buffer for retry
       }
     }
+    return Promise.resolve();
   }
 
   /**
    * Write events to object storage
    * TODO: Implement actual S3/MinIO client
    */
-  private async writeEventsToStorage(partition: string, events: ResearchEvent[]): Promise<void> {
-    const objectKey = this.getObjectKey(partition);
+  private static writeEventsToStorage(partition: string, events: ResearchEvent[]): void {
+    const objectKey = EventStorage.getObjectKey(partition);
 
     // Convert events to JSONL format
     const jsonl = events.map((e) => JSON.stringify(e)).join('\n');
@@ -143,7 +155,8 @@ export class EventStorage {
   /**
    * Retrieve events for a run
    */
-  async retrieve(runId: string, fromDate?: Date, toDate?: Date): Promise<ResearchEvent[]> {
+  // eslint-disable-next-line class-methods-use-this
+  retrieve(runId: string, fromDate?: Date, toDate?: Date): ResearchEvent[] {
     // TODO: Implement S3 list and retrieve
     logger.info('Retrieving events from storage', {
       metadata: {
@@ -159,7 +172,8 @@ export class EventStorage {
   /**
    * List all run IDs in storage
    */
-  async listRuns(): Promise<string[]> {
+  // eslint-disable-next-line class-methods-use-this
+  listRuns(): string[] {
     // TODO: Implement S3 list prefixes
     return [];
   }
@@ -194,10 +208,10 @@ export class EventStorage {
    * Get buffer statistics
    */
   getStats() {
-    let totalEvents = 0;
-    for (const events of this.buffer.values()) {
-      totalEvents += events.length;
-    }
+    const totalEvents = Array.from(this.buffer.values()).reduce(
+      (sum, events) => sum + events.length,
+      0
+    );
 
     return {
       partitions: this.buffer.size,

@@ -43,7 +43,10 @@ const consoleFormat = winston.format.combine(
   winston.format.timestamp({ format: 'HH:mm:ss.SSS' }),
   winston.format.printf(({ timestamp, level, message, metadata }) => {
     const metaStr = Object.keys(metadata || {}).length > 0 ? JSON.stringify(metadata) : '';
-    return `${timestamp} [${level}] ${message} ${metaStr}`;
+    const timestampStr = timestamp !== null && timestamp !== undefined ? String(timestamp) : '';
+    const levelStr = level !== null && level !== undefined ? String(level) : '';
+    const messageStr = typeof message === 'string' ? message : String(message);
+    return `${timestampStr} [${levelStr}] ${messageStr} ${metaStr}`;
   })
 );
 
