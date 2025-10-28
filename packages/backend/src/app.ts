@@ -15,6 +15,7 @@ import { config } from './config';
 import { logger } from './utils/logger';
 import { errorHandler, notFound } from './middleware/errorHandler';
 import { healthRouter } from './routes/health';
+import { eventsRouter } from './routes/events';
 
 /**
  * Create and configure Express application
@@ -50,6 +51,7 @@ export function createApp(): Application {
 
   // Routes
   app.use('/health', healthRouter);
+  app.use('/events', eventsRouter);
 
   // 404 handler
   app.use(notFound);

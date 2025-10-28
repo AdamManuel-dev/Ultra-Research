@@ -7,4 +7,5 @@
  */
 export * from './types/errors';
 export * from './types/events';
+export * from './validation';
 //# sourceMappingURL=index.d.ts.map

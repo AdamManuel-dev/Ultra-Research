@@ -18,6 +18,7 @@ const config_1 = require("./config");
 const logger_1 = require("./utils/logger");
 const errorHandler_1 = require("./middleware/errorHandler");
 const health_1 = require("./routes/health");
+const events_1 = require("./routes/events");
 /**
  * Create and configure Express application
  */
@@ -46,6 +47,7 @@ function createApp() {
     });
     // Routes
     app.use('/health', health_1.healthRouter);
+    app.use('/events', events_1.eventsRouter);
     // 404 handler
     app.use(errorHandler_1.notFound);
     // Error handler (must be last)

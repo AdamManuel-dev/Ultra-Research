@@ -12,4 +12,6 @@ const tslib_1 = require("tslib");
 tslib_1.__exportStar(require("./types/errors"), exports);
 // Event types
 tslib_1.__exportStar(require("./types/events"), exports);
+// Validation
+tslib_1.__exportStar(require("./validation"), exports);
 //# sourceMappingURL=index.js.map

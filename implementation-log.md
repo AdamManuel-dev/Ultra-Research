@@ -63,3 +63,36 @@
 
 **Next**: Phase 1.2 - Event Schema & Observability
 
+---
+
+### [2025-10-28 - IN PROGRESS] Phase 1.2: Event Schema & Observability
+
+**Status**: 🚧 Core components implemented (8/18 tasks)
+
+**Completed**:
+1. ✅ Unified event schema with TypeScript types
+2. ✅ Event validator with JSON Schema (Ajv)
+3. ✅ Event bus with SSE streaming support
+4. ✅ Event storage service (buffered writes, partitioning)
+5. ✅ Event streaming endpoints (GET /events/stream, POST /events)
+6. ✅ Event query API (GET /events)
+7. ✅ Event bus statistics (GET /events/stats)
+8. ✅ SSE connection management with heartbeats
+
+**Remaining** (10 tasks):
+- Event indexing with OpenSearch
+- Snapshot generator for replay
+- Event producers for all components (orchestrator, fetch, extract, index, graph, synthesis)
+- Analytics aggregation jobs
+- Event retention policies
+- Event-driven alerting
+- Unit and integration tests for event system
+
+**Quality Metrics**:
+- ✅ Type checking: 0 errors
+- ✅ Build: All packages compile successfully
+- ✅ Tests: 6 tests passing (backend)
+- ⏳ Coverage: Need tests for event system
+
+**Next**: Continue with Phase 1.2 (event indexing, producers, tests) then Phase 1.3
+
