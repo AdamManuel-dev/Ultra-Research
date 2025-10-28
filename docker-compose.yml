@@ -1,0 +1,117 @@
+version: '3.8'
+
+services:
+  # Neo4j Graph Database
+  neo4j:
+    image: neo4j:5.15-community
+    container_name: research-neo4j
+    ports:
+      - '7474:7474' # HTTP
+      - '7687:7687' # Bolt
+    environment:
+      - NEO4J_AUTH=neo4j/research_password
+      - NEO4J_PLUGINS=["apoc", "graph-data-science"]
+      - NEO4J_dbms_memory_heap_max__size=2G
+      - NEO4J_dbms_memory_pagecache_size=1G
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+      - neo4j_plugins:/plugins
+    healthcheck:
+      test: ['CMD-SHELL', 'cypher-shell -u neo4j -p research_password "RETURN 1"']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # OpenSearch for hybrid search
+  opensearch:
+    image: opensearchproject/opensearch:2.11.1
+    container_name: research-opensearch
+    environment:
+      - cluster.name=research-cluster
+      - node.name=opensearch-node1
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - 'OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g'
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin@123
+      - plugins.security.disabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - '9200:9200'
+      - '9600:9600'
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'curl -k -u admin:Admin@123 https://localhost:9200/_cluster/health || exit 1',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # OpenSearch Dashboards (optional)
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:2.11.1
+    container_name: research-dashboards
+    ports:
+      - '5601:5601'
+    environment:
+      - 'OPENSEARCH_HOSTS=["https://opensearch:9200"]'
+      - OPENSEARCH_USERNAME=admin
+      - OPENSEARCH_PASSWORD=Admin@123
+    depends_on:
+      - opensearch
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: research-redis
+    ports:
+      - '6379:6379'
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # MinIO for object storage (S3-compatible)
+  minio:
+    image: minio/minio:latest
+    container_name: research-minio
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  neo4j_data:
+  neo4j_logs:
+  neo4j_plugins:
+  opensearch_data:
+  redis_data:
+  minio_data:
+
+networks:
+  default:
+    name: research-network
