@@ -54,7 +54,7 @@ function checkDependencies() {
  */
 healthRouter.get(
   '/',
-  asyncHandler((_req: Request, res: Response) => {
+  asyncHandler(async (_req: Request, res: Response) => {
     const startTime = Date.now();
     const dependencies = checkDependencies();
 

@@ -40,7 +40,7 @@ eventsRouter.get('/stream', (req: Request, res: Response) => {
  */
 eventsRouter.get(
   '/',
-  asyncHandler((req: Request, res: Response) => {
+  asyncHandler(async (req: Request, res: Response) => {
     const runId = req.query['run_id'] as string | undefined;
     const limit = req.query['limit'] ? parseInt(req.query['limit'] as string, 10) : 100;
 
@@ -63,7 +63,7 @@ eventsRouter.get(
  */
 eventsRouter.post(
   '/',
-  asyncHandler((req: Request, res: Response) => {
+  asyncHandler(async (req: Request, res: Response) => {
     const event = req.body as ResearchEvent;
 
     // Publish to event bus
@@ -86,7 +86,7 @@ eventsRouter.post(
  */
 eventsRouter.get(
   '/stats',
-  asyncHandler((_req: Request, res: Response) => {
+  asyncHandler(async (_req: Request, res: Response) => {
     const stats = eventBus.getStats();
     res.json(stats);
   })
