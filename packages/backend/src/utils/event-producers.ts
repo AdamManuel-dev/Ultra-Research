@@ -61,6 +61,7 @@ function createEvent(
  * Publish an event to the event bus
  */
 export function publishEvent(event: ResearchEvent): void {
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   eventBus.publish(event);
 }
 
@@ -440,5 +441,6 @@ export function getCurrentStep(runId: string): number {
  * Helper to publish an event immediately
  */
 export function emitEvent(event: ResearchEvent): void {
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   eventBus.publish(event);
 }
