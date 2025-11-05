@@ -133,6 +133,7 @@ export class RateLimiter {
     while (!this.canMakeRequest(url)) {
       const now = Date.now();
       const oldestTimestamp = state.requestTimestamps[0];
+      if (!oldestTimestamp) break; // No timestamps, shouldn't happen
       const waitTime = 1000 - (now - oldestTimestamp);
 
       if (waitTime > 0) {
@@ -221,7 +222,7 @@ export class RateLimiter {
    */
   reset(url?: string): void {
     if (url) {
-      const domain = this.getDomain(url);
+      const domain = RateLimiter.getDomain(url);
       this.domainStates.delete(domain);
       logger.info('Rate limit reset', { metadata: { domain } });
     } else {
@@ -241,7 +242,7 @@ export class RateLimiter {
 
       logger.info('Applied robots.txt crawl delay', {
         metadata: {
-          domain: this.getDomain(url),
+          domain: RateLimiter.getDomain(url),
           crawl_delay_seconds: crawlDelaySeconds,
           requests_per_second: requestsPerSecond,
         },

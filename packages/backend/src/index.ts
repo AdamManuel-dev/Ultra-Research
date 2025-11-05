@@ -10,12 +10,13 @@
 
 import { createApp } from './app';
 import { config } from './config';
+import { opensearchEventIndexer } from './services/opensearch-event-indexer';
 import { logger } from './utils/logger';
 
 /**
  * Start the server
  */
-function start() {
+async function start() {
   try {
     logger.info('Starting Deep Research Cockpit backend', {
       metadata: {
@@ -24,6 +25,20 @@ function start() {
         logLevel: config.logLevel,
       },
     });
+
+    // Initialize OpenSearch templates
+    logger.info('Initializing OpenSearch event index templates');
+    try {
+      await opensearchEventIndexer.initializeTemplates();
+      logger.info('OpenSearch templates initialized successfully');
+    } catch (error) {
+      logger.warn('Failed to initialize OpenSearch templates', {
+        metadata: {
+          error: error instanceof Error ? error.message : String(error),
+          note: 'Server will continue, but event indexing may not work',
+        },
+      });
+    }
 
     const app = createApp();
 
@@ -37,8 +52,20 @@ function start() {
     });
 
     // Graceful shutdown
-    const shutdown = () => {
+    const shutdown = async () => {
       logger.info('Received shutdown signal, closing server gracefully');
+
+      // Close OpenSearch indexer (flush remaining events)
+      try {
+        await opensearchEventIndexer.close();
+        logger.info('OpenSearch indexer closed');
+      } catch (error) {
+        logger.error('Error closing OpenSearch indexer', {
+          metadata: {
+            error: error instanceof Error ? error.message : String(error),
+          },
+        });
+      }
 
       server.close(() => {
         logger.info('Server closed');
@@ -53,10 +80,10 @@ function start() {
     };
 
     process.on('SIGTERM', () => {
-      shutdown();
+      void shutdown();
     });
     process.on('SIGINT', () => {
-      shutdown();
+      void shutdown();
     });
 
     // Handle uncaught errors
@@ -92,7 +119,7 @@ function start() {
 
 // Start server if this is the main module
 if (require.main === module) {
-  start();
+  void start();
 }
 
 export { start };
