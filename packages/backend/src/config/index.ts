@@ -88,6 +88,23 @@ export interface AppConfig {
     enabled: boolean;
     endpoint?: string;
   };
+
+  // Scholarly API clients
+  crossref?: {
+    politeEmail: string;
+  };
+
+  openAlex?: {
+    politeEmail: string;
+  };
+
+  semanticScholar?: {
+    apiKey?: string;
+  };
+
+  unpaywall?: {
+    email: string;
+  };
 }
 
 /**
@@ -182,6 +199,30 @@ export function loadConfig(): AppConfig {
       enabled: process.env['ENABLE_TELEMETRY'] === 'true',
       endpoint: process.env['TELEMETRY_ENDPOINT'],
     },
+
+    crossref: process.env['CROSSREF_POLITE_EMAIL']
+      ? {
+          politeEmail: process.env['CROSSREF_POLITE_EMAIL'],
+        }
+      : undefined,
+
+    openAlex: process.env['OPENALEX_POLITE_EMAIL']
+      ? {
+          politeEmail: process.env['OPENALEX_POLITE_EMAIL'],
+        }
+      : undefined,
+
+    semanticScholar: process.env['SEMANTICSCHOLAR_API_KEY']
+      ? {
+          apiKey: process.env['SEMANTICSCHOLAR_API_KEY'],
+        }
+      : undefined,
+
+    unpaywall: process.env['UNPAYWALL_EMAIL']
+      ? {
+          email: process.env['UNPAYWALL_EMAIL'],
+        }
+      : undefined,
   };
 }
 
