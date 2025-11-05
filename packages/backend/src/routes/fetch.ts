@@ -23,7 +23,13 @@ export const fetchRouter = Router();
 fetchRouter.post(
   '/',
   asyncHandler(async (req: Request, res: Response) => {
-    const { url, runId, extractContent = true, convertMarkdown = true, skipCache = false } = req.body;
+    const {
+      url,
+      runId,
+      extractContent = true,
+      convertMarkdown = true,
+      skipCache = false,
+    } = req.body;
 
     // Validate required fields
     if (!url || !runId) {
@@ -108,7 +114,13 @@ fetchRouter.post(
 fetchRouter.post(
   '/batch',
   asyncHandler(async (req: Request, res: Response) => {
-    const { urls, runId, extractContent = true, convertMarkdown = true, concurrency = 5 } = req.body;
+    const {
+      urls,
+      runId,
+      extractContent = true,
+      convertMarkdown = true,
+      concurrency = 5,
+    } = req.body;
 
     // Validate required fields
     if (!urls || !Array.isArray(urls) || urls.length === 0) {

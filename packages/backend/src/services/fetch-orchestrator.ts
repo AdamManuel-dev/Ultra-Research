@@ -10,7 +10,6 @@
 
 import { createHash } from 'crypto';
 
-import { logger } from '../utils/logger';
 import {
   createFetchStartEvent,
   createFetchCompleteEvent,
@@ -19,6 +18,7 @@ import {
   createExtractCompleteEvent,
   publishEvent,
 } from '../utils/event-producers';
+import { logger } from '../utils/logger';
 
 import { contentExtractor, ExtractedContent } from './content-extractor';
 import { httpClient, FetchResponse } from './http-client';
@@ -158,7 +158,7 @@ export class FetchOrchestrator {
    * Calculate exponential backoff delay
    */
   private getBackoffDelay(retryCount: number): number {
-    return this.baseDelayMs * Math.pow(2, retryCount);
+    return this.baseDelayMs * 2 ** retryCount;
   }
 
   /**
@@ -207,8 +207,17 @@ export class FetchOrchestrator {
   /**
    * Fetch URL with retries
    */
-  private async fetchWithRetry(request: FetchRequest, retryCount: number = 0): Promise<FetchResult> {
-    const { url, runId, maxRetries = this.maxRetries, extractContent = true, convertMarkdown = true } = request;
+  private async fetchWithRetry(
+    request: FetchRequest,
+    retryCount: number = 0
+  ): Promise<FetchResult> {
+    const {
+      url,
+      runId,
+      maxRetries = this.maxRetries,
+      extractContent = true,
+      convertMarkdown = true,
+    } = request;
 
     const startTime = Date.now();
 
@@ -235,11 +244,13 @@ export class FetchOrchestrator {
 
       // Extract content if requested
       if (extractContent && response.contentType.includes('text/html')) {
-        publishEvent(createExtractStartEvent(
-          runId,
-          { url, html_size: response.body.length },
-          { type: 'url', value: url }
-        ));
+        publishEvent(
+          createExtractStartEvent(
+            runId,
+            { url, html_size: response.body.length },
+            { type: 'url', value: url }
+          )
+        );
 
         extracted = await contentExtractor.extract(response.body, url);
 
@@ -248,16 +259,18 @@ export class FetchOrchestrator {
           markdown = markdownConverter.convertWithMetadata(extracted.content);
         }
 
-        publishEvent(createExtractCompleteEvent(
-          runId,
-          { url },
-          {
-            text_length: extracted.textContent.length,
-            markdown_length: markdown?.markdown.length || 0,
-            extraction_method: 'readability',
-            duration_ms: Date.now() - startTime,
-          }
-        ));
+        publishEvent(
+          createExtractCompleteEvent(
+            runId,
+            { url },
+            {
+              text_length: extracted.textContent.length,
+              markdown_length: markdown?.markdown.length || 0,
+              extraction_method: 'readability',
+              duration_ms: Date.now() - startTime,
+            }
+          )
+        );
       }
 
       const result: FetchResult = {
@@ -274,16 +287,18 @@ export class FetchOrchestrator {
       };
 
       // Publish fetch complete event
-      publishEvent(createFetchCompleteEvent(
-        runId,
-        { url },
-        {
-          status_code: response.status,
-          content_length: response.body.length,
-          content_type: response.contentType,
-          duration_ms: result.duration_ms,
-        }
-      ));
+      publishEvent(
+        createFetchCompleteEvent(
+          runId,
+          { url },
+          {
+            status_code: response.status,
+            content_length: response.body.length,
+            content_type: response.contentType,
+            duration_ms: result.duration_ms,
+          }
+        )
+      );
 
       logger.info('Fetch completed successfully', {
         metadata: {
@@ -323,14 +338,16 @@ export class FetchOrchestrator {
       }
 
       // Max retries exceeded, publish error event
-      publishEvent(createFetchErrorEvent(
-        runId,
-        { url },
-        {
-          message: error instanceof Error ? error.message : String(error),
-          code: 'FETCH_ERROR',
-        }
-      ));
+      publishEvent(
+        createFetchErrorEvent(
+          runId,
+          { url },
+          {
+            message: error instanceof Error ? error.message : String(error),
+            code: 'FETCH_ERROR',
+          }
+        )
+      );
 
       logger.error('Fetch failed after retries', {
         metadata: {
@@ -409,9 +426,7 @@ export class FetchOrchestrator {
     for (let i = 0; i < requests.length; i += concurrency) {
       const batch = requests.slice(i, i + concurrency);
 
-      const batchResults = await Promise.allSettled(
-        batch.map((req) => this.fetch(req))
-      );
+      const batchResults = await Promise.allSettled(batch.map((req) => this.fetch(req)));
 
       batchResults.forEach((result, index) => {
         if (result.status === 'fulfilled') {

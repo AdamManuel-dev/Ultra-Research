@@ -18,6 +18,7 @@ import { eventsRouter } from './routes/events';
 import { eventsAdvancedRouter } from './routes/events-advanced';
 import { fetchRouter } from './routes/fetch';
 import { healthRouter } from './routes/health';
+import searchRouter from './routes/search';
 import { logger } from './utils/logger';
 
 /**
@@ -57,6 +58,7 @@ export function createApp(): Application {
   app.use('/events', eventsRouter);
   app.use('/events', eventsAdvancedRouter);
   app.use('/fetch', fetchRouter);
+  app.use('/search', searchRouter);
 
   // 404 handler
   app.use(notFound);

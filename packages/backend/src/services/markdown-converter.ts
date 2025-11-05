@@ -75,10 +75,9 @@ export class MarkdownConverter {
     // Handle tables
     this.turndown.addRule('table', {
       filter: 'table',
-      replacement: (content) => {
+      replacement: (content) =>
         // Simple table conversion (can be enhanced)
-        return `\n\n${content}\n\n`;
-      },
+        `\n\n${content}\n\n`,
     });
   }
 

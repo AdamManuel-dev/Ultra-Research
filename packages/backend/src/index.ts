@@ -10,6 +10,7 @@
 
 import { createApp } from './app';
 import { config } from './config';
+import { documentIndexer } from './services/document-indexer';
 import { opensearchEventIndexer } from './services/opensearch-event-indexer';
 import { logger } from './utils/logger';
 
@@ -36,6 +37,20 @@ async function start() {
         metadata: {
           error: error instanceof Error ? error.message : String(error),
           note: 'Server will continue, but event indexing may not work',
+        },
+      });
+    }
+
+    // Initialize document indexer
+    logger.info('Initializing document indexer');
+    try {
+      await documentIndexer.initializeIndex();
+      logger.info('Document indexer initialized successfully');
+    } catch (error) {
+      logger.warn('Failed to initialize document indexer', {
+        metadata: {
+          error: error instanceof Error ? error.message : String(error),
+          note: 'Server will continue, but document indexing may not work',
         },
       });
     }

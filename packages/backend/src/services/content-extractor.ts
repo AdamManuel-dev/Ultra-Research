@@ -8,10 +8,10 @@
  * Patterns: Readability for article extraction, Cheerio for parsing
  */
 
+import { Readability } from '@mozilla/readability';
 import * as cheerio from 'cheerio';
 import { decode } from 'iconv-lite';
 import { JSDOM } from 'jsdom';
-import { Readability } from '@mozilla/readability';
 
 import { logger } from '../utils/logger';
 
@@ -48,9 +48,7 @@ export class ContentExtractor {
     const htmlStr = typeof html === 'string' ? html : html.toString('utf-8');
 
     // Check for meta charset tag
-    const charsetMatch = htmlStr.match(
-      /<meta[^>]+charset\s*=\s*["']?([^"'\s/>]+)/i
-    );
+    const charsetMatch = htmlStr.match(/<meta[^>]+charset\s*=\s*["']?([^"'\s/>]+)/i);
     if (charsetMatch?.[1]) {
       return charsetMatch[1].toLowerCase();
     }
@@ -97,10 +95,12 @@ export class ContentExtractor {
     const metadata: ExtractedContent['metadata'] = {};
 
     // Open Graph metadata
-    metadata.description = $('meta[property="og:description"]').attr('content') ||
+    metadata.description =
+      $('meta[property="og:description"]').attr('content') ||
       $('meta[name="description"]').attr('content');
     metadata.image = $('meta[property="og:image"]').attr('content');
-    metadata.author = $('meta[name="author"]').attr('content') ||
+    metadata.author =
+      $('meta[name="author"]').attr('content') ||
       $('meta[property="article:author"]').attr('content');
 
     // Keywords
@@ -153,7 +153,7 @@ export class ContentExtractor {
 
         const result: ExtractedContent = {
           title,
-          content: '<p>' + bodyText.substring(0, 5000) + '</p>',
+          content: `<p>${bodyText.substring(0, 5000)}</p>`,
           textContent: bodyText,
           excerpt: bodyText.substring(0, 200),
           byline: metadata.author || null,
