@@ -16,6 +16,7 @@ import { config } from './config';
 import { errorHandler, notFound } from './middleware/errorHandler';
 import { eventsRouter } from './routes/events';
 import { eventsAdvancedRouter } from './routes/events-advanced';
+import { fetchRouter } from './routes/fetch';
 import { healthRouter } from './routes/health';
 import { logger } from './utils/logger';
 
@@ -55,6 +56,7 @@ export function createApp(): Application {
   app.use('/health', healthRouter);
   app.use('/events', eventsRouter);
   app.use('/events', eventsAdvancedRouter);
+  app.use('/fetch', fetchRouter);
 
   // 404 handler
   app.use(notFound);
